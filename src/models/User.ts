@@ -1,8 +1,8 @@
 import { WithFieldValue, QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 export const userConverter = {
-  toFirestore(adj: WithFieldValue<User>) {
-    return { socialCreditScore: adj.socialCreditScore };
+  toFirestore(user: WithFieldValue<User>) {
+    return { socialCreditScore: user.socialCreditScore };
   },
   fromFirestore(snapshot: QueryDocumentSnapshot): User {
     const data = snapshot.data() as User;
