@@ -1,7 +1,12 @@
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { Client } from 'discord.js';
 
 export const initDiscordClient = async (client: Client) => {
-  const token = process.env.DISCORD_TOKEN;
+  const secretMgrClient = new SecretManagerServiceClient();
+  const [accessResponse] = await secretMgrClient.accessSecretVersion({
+    name: 'projects/808553059840/secrets/DISCORD_TOKEN',
+  });
+  const token = accessResponse.payload?.data?.toString();
   if (!token) {
     throw new Error('Discord token not provided.');
   }
