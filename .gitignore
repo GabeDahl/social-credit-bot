@@ -36,3 +36,6 @@ serviceAccountKey.json
 
 # NLP model
 model.nlp
+
+# SSH Script
+ssh.txt

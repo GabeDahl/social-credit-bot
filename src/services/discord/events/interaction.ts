@@ -9,13 +9,22 @@ export enum InteractionCustomIds {
 export const interactionHandler = async (interaction: Interaction) => {
   if (!interaction.isButton()) return;
 
-  await interaction.deferReply();
+  await interaction.deferReply({ ephemeral: true });
   console.log(`button ${interaction.customId}`);
-  const originalTargetUserId = interaction.customId.substring(interaction.customId.lastIndexOf('-') + 1);
-  if (interaction.user.id !== originalTargetUserId) return;
+  const interactionIdAndUserId = interaction.customId;
+  const lastHyphenIndex = interactionIdAndUserId.lastIndexOf('-');
+  const base = interactionIdAndUserId.substring(0, lastHyphenIndex);
+  const userId = interactionIdAndUserId.substring(lastHyphenIndex + 1);
+  console.log(base);
+  console.log(userId);
+  if (interaction.user.id !== userId) {
+    console.log('mismatch');
+    await interaction.followUp('not your button to press, pal');
+  }
+
   const user = await getUser(interaction.user.id);
 
-  switch (interaction.customId) {
+  switch (base) {
     case InteractionCustomIds.GenerateReport:
       {
         if (!user) return;
@@ -32,20 +41,15 @@ export const interactionHandler = async (interaction: Interaction) => {
               value: String(user.socialCreditScore),
             },
           ]);
-        interaction.followUp({
+        await interaction.followUp({
           embeds: [embed],
-          ephemeral: true,
         });
       }
 
       break;
     case InteractionCustomIds.Appeal:
-      interaction.followUp({
-        content: `Appeal received. We'll review and notify you of our decision.`,
-        ephemeral: true,
-      });
-      setTimeout(() => {
-        interaction.followUp({ ephemeral: true, content: 'Your appeal has been rejected.' });
+      setTimeout(async () => {
+        await interaction.followUp({ ephemeral: true, content: 'Your appeal has been rejected.' });
       }, 5000);
       break;
     default:

@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, Message } from 'discord.js';
-import { NlpMachine } from '../../../models/message-analysis/NlpMachine.js';
 import { adjustScore } from '../../firebase/scoresAdjustments.js';
 import { InteractionCustomIds } from './interaction.js';
+import { getScore } from '../../gpt/scoring.js';
 
 export enum BOT_UTTERANCES {
   NoMentionNeeded = `There is no need for mentions or slash commands. I am always watching.`,
@@ -9,15 +9,14 @@ export enum BOT_UTTERANCES {
   NegativeStatementDetected = `This message has been flagged. Your social credit has decreased by 10. Further unsanctioned discourse may result in censorship.`,
 }
 
-export const messageHandler = async (msg: Message, client: Client, nlpMachine: NlpMachine) => {
+export const messageHandler = async (msg: Message, client: Client) => {
   if (msg.author.bot || msg.system) return;
   const extraMessages: string[] = [];
   if (client.user && msg.mentions.has(client.user)) {
     extraMessages.push(BOT_UTTERANCES.NoMentionNeeded);
   }
-  const { intent, score } = await nlpMachine.process(msg.content);
-  console.log(`intent: ${intent} -- score: ${score}`);
-  const isSignificant = score > 0.99;
+  if (msg.content.length < 5) return;
+  const score = await getScore(msg.content);
 
   const generateReport = new ButtonBuilder()
     .setCustomId(InteractionCustomIds.GenerateReport + '-' + msg.author.id)
@@ -29,13 +28,13 @@ export const messageHandler = async (msg: Message, client: Client, nlpMachine: N
     .setStyle(ButtonStyle.Danger);
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(generateReport, appeal);
 
-  if (isSignificant && intent === 'positive') {
+  if (0 < score) {
     await adjustScore({ amount: 10, userId: msg.author.id });
     msg.reply({
       content: BOT_UTTERANCES.PositiveStatementDetected,
       components: [row],
     });
-  } else if (isSignificant && intent === 'negative') {
+  } else if (0 > score) {
     await adjustScore({ amount: -10, userId: msg.author.id });
     msg.reply({
       content: BOT_UTTERANCES.NegativeStatementDetected,

@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { Client, GatewayIntentBits } from 'discord.js';
-import { NlpMachine } from './models/message-analysis/NlpMachine.js';
-import { startBot, trainMachine } from './initialization.js';
+import { startBot } from './initialization.js';
 import { initializeApp, applicationDefault } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
@@ -11,8 +10,6 @@ initializeApp({
 
 export const db = getFirestore();
 
-const nlpMachine = new NlpMachine();
-trainMachine(nlpMachine);
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -23,7 +20,7 @@ const client = new Client({
     GatewayIntentBits.GuildIntegrations,
   ],
 });
-startBot(client, nlpMachine)
+startBot(client)
   .then(() => {
     console.log('Bot started successfully');
   })
