@@ -20,17 +20,17 @@ export const messageHandler = async (msg: Message, client: Client, nlpMachine: N
   const isSignificant = score > 0.99;
 
   const generateReport = new ButtonBuilder()
-    .setCustomId(InteractionCustomIds.GenerateReport)
+    .setCustomId(InteractionCustomIds.GenerateReport + '-' + msg.author.id)
     .setLabel('Generate Report')
     .setStyle(ButtonStyle.Primary);
   const appeal = new ButtonBuilder()
-    .setCustomId(InteractionCustomIds.Appeal)
+    .setCustomId(InteractionCustomIds.Appeal + '-' + msg.author.id)
     .setLabel('Appeal Score Adjustment')
     .setStyle(ButtonStyle.Danger);
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(generateReport, appeal);
 
   if (isSignificant && intent === 'positive') {
-    // await adjustScore({ amount: 10, userId: msg.author.id });
+    await adjustScore({ amount: 10, userId: msg.author.id });
     msg.reply({
       content: BOT_UTTERANCES.PositiveStatementDetected,
       components: [row],

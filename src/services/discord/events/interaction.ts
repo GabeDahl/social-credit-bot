@@ -11,6 +11,8 @@ export const interactionHandler = async (interaction: Interaction) => {
 
   await interaction.deferReply();
   console.log(`button ${interaction.customId}`);
+  const originalTargetUserId = interaction.customId.substring(interaction.customId.lastIndexOf('-') + 1);
+  if (interaction.user.id !== originalTargetUserId) return;
   const user = await getUser(interaction.user.id);
 
   switch (interaction.customId) {
@@ -32,14 +34,18 @@ export const interactionHandler = async (interaction: Interaction) => {
           ]);
         interaction.followUp({
           embeds: [embed],
+          ephemeral: true,
         });
       }
 
       break;
     case InteractionCustomIds.Appeal:
-      interaction.followUp(`Appeal received. We'll review and notify you of our decision.`);
+      interaction.followUp({
+        content: `Appeal received. We'll review and notify you of our decision.`,
+        ephemeral: true,
+      });
       setTimeout(() => {
-        interaction.followUp('Your appeal has been rejected.');
+        interaction.followUp({ ephemeral: true, content: 'Your appeal has been rejected.' });
       }, 5000);
       break;
     default:
