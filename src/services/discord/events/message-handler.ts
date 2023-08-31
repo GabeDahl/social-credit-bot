@@ -21,11 +21,11 @@ export const messageHandler = async (msg: Message, client: Client) => {
   const generateReport = new ButtonBuilder()
     .setCustomId(InteractionCustomIds.GenerateReport + '-' + msg.author.id)
     .setLabel('Generate Report')
-    .setStyle(ButtonStyle.Primary);
+    .setStyle(ButtonStyle.Secondary);
   const appeal = new ButtonBuilder()
     .setCustomId(InteractionCustomIds.Appeal + '-' + msg.author.id)
-    .setLabel('Appeal Score Adjustment')
-    .setStyle(ButtonStyle.Danger);
+    .setLabel('Appeal')
+    .setStyle(ButtonStyle.Secondary);
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(generateReport, appeal);
 
   if (0 < score) {
