@@ -33,7 +33,7 @@ export const interactionHandler = async (interaction: Interaction) => {
           .setTitle('Social Credit Report')
           .setAuthor({
             name: 'The Credit Bureau',
-            iconURL: 'https://cdn.theorg.com/055eaccb-c323-44ea-9240-489e9926d960_medium.jpg',
+            iconURL: 'https://b.thumbs.redditmedia.com/J36LSECOx8ukkKWTMoGmNyi15-esVGRo194wLYiI3rw.png',
           })
           .addFields([
             {
@@ -49,7 +49,10 @@ export const interactionHandler = async (interaction: Interaction) => {
       break;
     case InteractionCustomIds.Appeal:
       setTimeout(async () => {
-        await interaction.followUp({ ephemeral: true, content: 'Your appeal has been rejected.' });
+        await interaction.followUp({
+          ephemeral: true,
+          content: 'Your appeal has been rejected.',
+        });
       }, 5000);
       break;
     default:
